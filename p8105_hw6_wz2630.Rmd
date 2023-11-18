@@ -1,0 +1,14 @@
+---
+title: "p8105_hw6_wz2630"
+output: github_document
+---
+
+# Problem 1
+(omitted)
+
+
+# Problem 2
+```{r}
+
+```
+
