@@ -1,5 +1,5 @@
 ---
-title: "p8105_hw6_wz2630"
+title: "P8105 homework 6: linear models, cross validation, bootstrapping"
 output: github_document
 ---
 ```{r}
@@ -34,6 +34,7 @@ weather_df =
 ```
 
 ## Bootstrapping
+
 The boostrap is helpful when you’d like to perform inference for a parameter / value / summary that doesn’t have an easy-to-write-down distribution in the usual repeated sampling framework. We’ll focus on a simple linear regression with tmax as the response with tmin and prcp as the predictors, and are interested in the distribution of two quantities estimated from these data:
 
 * r_hat^2
@@ -127,6 +128,7 @@ pivot_bootstrap_results |>
     ci_upper = quantile(quantity2, 0.975, na.rm = TRUE)) |> 
     knitr::kable()
 ```
+
 **Comments:**
 
 * r-squared 95% CI: (0.889, 0.941)
@@ -193,6 +195,7 @@ birthweight |>
   geom_point(alpha = 0.5) + 
   labs(x = "Predicted values", y = "Residuals", title = "Predicted Values vs. Residuals")
 ```
+
 **Comments:**
 
 Observed from the "Predicted Values vs. Residuals" scatterplot, our proposed model's residuals are mainly scattered close to y = 0, which suggests linearity.
@@ -250,6 +253,7 @@ bwt_df |>
        y = "Root Mean Square Error (rmse)", 
        title = "Distribution of RMSE Values for Each Candidate Model")
 ```
+
 **Comments:**
 
 My proposed stepwise model appears to have the smallest RMSE. (RMSE provides a measure of the typical size of the errors the model makes in its predictions. A lower RMSE indicates a better fit of the model to the data.)
