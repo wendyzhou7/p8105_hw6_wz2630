@@ -161,30 +161,27 @@ Propose a regression model for birthweight. This model may be based on a hypothe
 
 ### full model
 ```{r}
-full_model = 
-  lm(bwt~., data=birthweight) |> 
-  broom::tidy() |> 
-  select(term, estimate, p.value) |> 
-  knitr::kable()
-
+full_model = lm(bwt~., data=birthweight)
 full_model
 
+summary(full_model) |> 
+  broom::tidy() |> 
+  select(term, estimate, p.value)
 ```
 
 ### proposed model
 ```{r}
-stepwise_model = 
-  lm(bwt~babysex+bhead+blength+delwt+fincome+gaweeks+ppwt+smoken, data=birthweight) |> 
-  broom::tidy() |> 
-  select(term, estimate, p.value) |> 
-  knitr::kable()
-
+stepwise_model = lm(bwt~bhead + blength + delwt + fincome + gaweeks + ppwt + smoken, data = birthweight)
 stepwise_model
+
+summary(stepwise_model) |> 
+  broom::tidy() |> 
+  select(term, estimate, p.value)
 ```
 **Comments:**
 Variables for the stepwise model were chosen based on eliminating those with large p-value scores --though there is not set definition, I used those with p-value < 0.20. It is also reasonable that a baby's birthweight is related to family monthly income, the baby's measurements, gestational age in weeks, mother's prepregnancy weight and whether the mother smoked during pregnancy.
 
-
+### predictions vs. residuals plot
 ```{r}
 #birthweight |>
 #  modelr::add_residuals(full_model) |>
