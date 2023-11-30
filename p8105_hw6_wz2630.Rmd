@@ -181,15 +181,16 @@ summary(stepwise_model) |>
 **Comments:**
 Variables for the stepwise model were chosen based on eliminating those with large p-value scores --though there is not set definition, I used those with p-value < 0.20. It is also reasonable that a baby's birthweight is related to family monthly income, the baby's measurements, gestational age in weeks, mother's prepregnancy weight and whether the mother smoked during pregnancy.
 
+
 ### predictions vs. residuals plot
 ```{r}
-#birthweight |>
-#  modelr::add_residuals(full_model) |>
-#  modelr::add_predictions(full_model) |> 
-#  ggplot(aes(x = resid, y = pred)) + 
-#  geom_point()
+birthweight |>
+  modelr::add_residuals(stepwise_model) |>
+  modelr::add_predictions(stepwise_model) |> 
+  ggplot(aes(x = pred, y = resid)) + 
+  geom_point(alpha = 0.5) + 
+  labs(x = "Predicted values", y = "Residuals", title = "Predicted Values vs. Residuals")
 ```
-
 
 Compare your model to two others:
 
@@ -199,7 +200,10 @@ Compare your model to two others:
 
 Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate.
 
-Note that although we expect your model to be reasonable, model building itself is not a main idea of the course and we don’t necessarily expect your model to be “optimal”.
+```{r}
+
+```
+
 
 
 
