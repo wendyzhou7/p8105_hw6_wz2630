@@ -5,6 +5,8 @@ output: github_document
 ```{r}
 library(dplyr)
 library(tidyverse)
+library(modelr)
+library(knitr)
 ```
 
 
@@ -101,7 +103,7 @@ The distribution of r-squared estimates are approximately normal. The r-squared 
 
 The distribution of log(beta_hat1xbeta_hat2) is left skewed. There seems to be outliers based on the histogram.
 
-* Applying log(tmin * prcp) produced NaNs because log cannot be applied to ≤ 0; therefore, I have to explicitly apply to only positive values.
+* Applying log(tmin * prcp) produced NaNs because log cannot be applied to ≤ 0; therefore, I have to explicitly apply to only positive values. Note: there are `sum(is.na(pivot_bootstrap_results[["quantity2"]]))` quantity2 with negative values that we cannot take log of.
 
 * log(beta_hat1*beta_hat2) = quantity2
 
@@ -113,13 +115,15 @@ The distribution of log(beta_hat1xbeta_hat2) is left skewed. There seems to be o
 pivot_bootstrap_results |> 
   summarize(
     ci_lower = quantile(r.squared, 0.025), 
-    ci_upper = quantile(r.squared, 0.975))
+    ci_upper = quantile(r.squared, 0.975)) |>   
+    knitr::kable()
 
 # quantity2
 pivot_bootstrap_results |> 
   summarize(
     ci_lower = quantile(quantity2, 0.025, na.rm = TRUE), 
-    ci_upper = quantile(quantity2, 0.975, na.rm = TRUE))
+    ci_upper = quantile(quantity2, 0.975, na.rm = TRUE)) |> 
+    knitr::kable()
 ```
 **Comments:**
 
@@ -132,12 +136,73 @@ NAs are ommitted.
 The 95% confidence interval for r-squared is **(0.889, 0.941)** and for log(beta_hat1xbeta_hat2) is **(-8.98, -4.60)**.
 
 
+
 # Problem 3
+
+In this problem, you will analyze data gathered to understand the effects of several variables on a child’s birthweight. 
+
+Load and clean the data for regression analysis (i.e. convert numeric to factor where appropriate, check for missing data, etc.).
+
+## load and clean dataset
 ```{r}
+birthweight = 
+  read_csv(file = "./data/birthweight.csv") |> 
+  janitor::clean_names() |> 
+  drop_na() |> 
+  mutate(
+    babysex = as.factor(babysex),
+    frace=recode(frace,"1"="White", "2"="Black", "3"="Asian", "4"="Puerto Rican", '8'="Other", "9"="Unknown"),
+    frace = as.factor(frace),
+    mrace=recode(mrace,"1" = "White", "2" = "Black", "3" = "Asian", "4"="Puerto Rican", "8"="Other"),
+    mrace = as.factor(mrace))
+```
+
+Propose a regression model for birthweight. This model may be based on a hypothesized structure for the factors that underly birthweight, on a data-driven model-building process, or a combination of the two. Describe your modeling process and show a plot of model residuals against fitted values – use add_predictions and add_residuals in making this plot.
+
+### full model
+```{r}
+full_model = 
+  lm(bwt~., data=birthweight) |> 
+  broom::tidy() |> 
+  select(term, estimate, p.value) |> 
+  knitr::kable()
+
+full_model
 
 ```
 
+### proposed model
+```{r}
+stepwise_model = 
+  lm(bwt~babysex+bhead+blength+delwt+fincome+gaweeks+ppwt+smoken, data=birthweight) |> 
+  broom::tidy() |> 
+  select(term, estimate, p.value) |> 
+  knitr::kable()
 
+stepwise_model
+```
+**Comments:**
+Variables for the stepwise model were chosen based on eliminating those with large p-value scores --though there is not set definition, I used those with p-value < 0.20. It is also reasonable that a baby's birthweight is related to family monthly income, the baby's measurements, gestational age in weeks, mother's prepregnancy weight and whether the mother smoked during pregnancy.
+
+
+```{r}
+#birthweight |>
+#  modelr::add_residuals(full_model) |>
+#  modelr::add_predictions(full_model) |> 
+#  ggplot(aes(x = resid, y = pred)) + 
+#  geom_point()
+```
+
+
+Compare your model to two others:
+
+* One using length at birth and gestational age as predictors (main effects only)
+
+* One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
+
+Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate.
+
+Note that although we expect your model to be reasonable, model building itself is not a main idea of the course and we don’t necessarily expect your model to be “optimal”.
 
 
 
